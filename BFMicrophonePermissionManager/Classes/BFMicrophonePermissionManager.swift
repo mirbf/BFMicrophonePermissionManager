@@ -5,6 +5,7 @@ import UIKit
 @objcMembers
 public final class BFMicrophonePermissionManager: NSObject {
     public static let shared = BFMicrophonePermissionManager()
+    private static var suppressGuideAlertOnceAfterSystemDeny = false
 
     private override init() {
         super.init()
@@ -31,8 +32,8 @@ public final class BFMicrophonePermissionManager: NSObject {
 
     /// Behavior:
     /// - If status is .undetermined, only the system prompt is shown.
-    /// - If user denies in the system prompt, the guide alert is NOT shown in this same request.
-    /// - If called later and status is .denied, the guide alert is shown.
+    /// - If user denies in the system prompt, the guide alert is NOT shown immediately.
+    /// - The first later call with status .denied is suppressed once (no guide), then guide is shown on subsequent calls.
     @objc(requestAuthorizationFromViewController:completion:)
     public class func requestAuthorization(fromViewController viewController: UIViewController?,
                                           completion: @escaping (Bool) -> Void) {
@@ -45,14 +46,21 @@ public final class BFMicrophonePermissionManager: NSObject {
         case .undetermined:
             AVAudioSession.sharedInstance().requestRecordPermission { granted in
                 DispatchQueue.main.async {
+                    suppressGuideAlertOnceAfterSystemDeny = !granted
                     completion(granted)
                 }
             }
 
         case .granted:
+            suppressGuideAlertOnceAfterSystemDeny = false
             DispatchQueue.main.async { completion(true) }
 
         case .denied:
+            if suppressGuideAlertOnceAfterSystemDeny {
+                suppressGuideAlertOnceAfterSystemDeny = false
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
             showPermissionGuideAlert(fromViewController: viewController, title: nil, message: nil) { _ in
                 DispatchQueue.main.async { completion(false) }
             }
@@ -93,7 +101,7 @@ public final class BFMicrophonePermissionManager: NSObject {
 
             let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: settingsTitle, style: .default) { _ in
-                openAppSettings()
+                openAppSettingsInternal()
                 completion?(true)
             })
             alert.addAction(UIAlertAction(title: cancelTitle, style: .cancel) { _ in
@@ -108,11 +116,11 @@ public final class BFMicrophonePermissionManager: NSObject {
 
     @objc
     public class func openAppSettings() {
-        openAppSettings()
+        openAppSettingsInternal()
     }
 }
 
-private func openAppSettings() {
+private func openAppSettingsInternal() {
     DispatchQueue.main.async {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url, options: [:], completionHandler: nil)

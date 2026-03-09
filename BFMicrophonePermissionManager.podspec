@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'BFMicrophonePermissionManager'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'Microphone permission request + guide alert helper (Swift, ObjC-callable).'
 
   s.description      = <<-DESC

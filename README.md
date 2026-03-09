@@ -48,8 +48,9 @@ BFMicrophonePermissionManager.requestAuthorization(fromViewController: self) { a
 
 ## Behavior
 
-- Status `.undetermined`: shows only the system prompt; if user denies, it does NOT show the guide alert in the same request.
-- Later calls when status is `.denied`: shows the guide alert.
+- Status `.undetermined`: shows only the system prompt.
+- If user denies in the system prompt: it does NOT show the guide alert immediately.
+- The first later call when status is `.denied` is suppressed once (still no guide); subsequent denied calls show the guide alert.
 
 ## Guide Alert Customization
 
