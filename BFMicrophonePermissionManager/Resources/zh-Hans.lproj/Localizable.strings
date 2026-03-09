@@ -1,0 +1,7 @@
+/* Guide alert strings (Microphone) */
+
+"bf_permission_common_settings" = "去设置";
+"bf_permission_common_cancel" = "取消";
+
+"bf_permission_microphone_title" = "需要麦克风权限";
+"bf_permission_microphone_message" = "用于访问麦克风，请在设置中开启麦克风权限";

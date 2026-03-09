@@ -1,0 +1,7 @@
+/* Guide alert strings (Microphone) */
+
+"bf_permission_common_settings" = "Settings";
+"bf_permission_common_cancel" = "Cancel";
+
+"bf_permission_microphone_title" = "Microphone Permission Required";
+"bf_permission_microphone_message" = "Used to access your microphone. Please enable Microphone access in Settings.";
